@@ -1,1 +1,0 @@
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/_CPack_Packages/Darwin/DragNDrop/AsciiRenderer-0.1.1-Darwin/./AsciiRenderer

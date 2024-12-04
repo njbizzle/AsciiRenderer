@@ -1,9 +1,0 @@
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/AsciiRenderer.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/package.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/package_source.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/edit_cache.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/rebuild_cache.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/list_install_components.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/install.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/install/local.dir
-/Users/natemurphy/Desktop/projects/cpp/AsciiRenderer/build/CMakeFiles/install/strip.dir

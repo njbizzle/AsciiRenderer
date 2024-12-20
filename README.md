@@ -8,7 +8,7 @@ The parts that I really spent a lot of time on were the math behind the rotation
 
 ## Tools Used
 
-- Cmake (for building), Clang (the compiler), and clion (the IDE)
+- Cmake (for building), Clang (the compiler), and Clion (the IDE)
 - Eigen (a linear algebra library)
 
 # Examples

@@ -95,7 +95,7 @@ Modern GPUs are built around using triangles, and so are most nearly all graphic
 
 When I first started thinking through the project I got stumped on finding a way to programmatically solve for the intersection between some surface and a ray sent out to test the distance from the camera. But, when doing some optimization problems for higher dimensional functions in a calculus class, I had an idea of how I might be able to estimate these points.
 
-## Solving for the intersections, the estim_zeros function
+## Solving for the Intersections, the estim_zeros function
 
 The setup is that I have a ray with a position and normalized direction, and then a parametric surface. So idea was to have a function taking in a ray distance and the inputs to the parametric surface, then returning a 3D vector representing the distance between the ray (given the distance) and the surface (given the coordinates), all of which is continuous, meaning that there are ways to estimate its zeros, which in this case corresponds to the ray intersecting with the surface.
 

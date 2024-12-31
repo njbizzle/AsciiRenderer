@@ -116,3 +116,9 @@ You’ve probably noticed the noise in the displays, how occasionally there seem
 Also the “luminance” of the surface at the moment, is really just the depth, or the distance from the camera. I want to do more of a ray tracing technique in the future, and make use of the normals to actually bounce some light around and have a way to define actual light sources, rather than just a depth map.
 
 Speed is also a little bit of a problem. For the purpose of just being in the console and slowly spinning, it works well. But it currently is doing an insane amount of matrix inversions (which I’m pretty sure is the main source of the slowness), and I’m certain there are faster methods that either converge faster or use fewer resources.
+
+## Additional Images
+
+<img src="AsciiShapes/sin_uv_close_up.png">
+<img src="AsciiShapes/wavy_torus_hor_16_close_up.png">
+<img src="AsciiShapes/wavy_torus_strange.png">

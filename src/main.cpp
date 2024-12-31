@@ -3,32 +3,32 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <math.h>
-#include <algorithm>
 #include <cstdlib>
 #include <functional>
 
 // x forward, y left, z up
 
-float WIDTH = 30;
-float HEIGHT = 30;
+float WIDTH = 141;
+float HEIGHT = 74;
 
-float VIEW_W = 6;
-float VIEW_H = 6;
+float VIEW_W = 10;
+float VIEW_H = VIEW_W * HEIGHT / WIDTH;
 
 float big_r = 2;
 float little_r = 1;
 
-Eigen::Vector3f look_from = {0,0,5};
+Eigen::Vector3f look_from = {5,5,5};
 Eigen::Vector3f look_at = {0,0,0};
+
 Eigen::Vector3f camera_relative_up = {0,1,0};
 
 
 Eigen::Vector3f rot_axis = {1,1,1}; // will be normalized
-float steps_per_rot = 15; // will be normalized
+float steps_per_rot = 15;
 
 
-int max_iter = 10;
-float tolerance = 1e-4;
+int max_iter = 15;
+float tolerance = 1e-5;
 
 float one_over_tolerance = 1 / tolerance;
 
@@ -75,7 +75,7 @@ Eigen::Matrix4f quat_rot_homog(float theta, Eigen::Vector3f axis) {
 	float r00, r01, r02, r10, r11, r12, r20, r21, r22;
 	// https://automaticaddison.com/how-to-convert-a-quaternion-to-a-rotation-matrix/
 	// this article had some code to copy paste so i don't have to make any typos
-	// alterations were made to turn it from python to cpp and to make it into a homogenous coordinate system
+	// alterations were made to turn it from python to cpp and to make it use a homogenous coordinate system
 	r00 = 2 * (q0 * q0 + q1 * q1) - 1;
     r01 = 2 * (q1 * q2 - q0 * q3);
     r02 = 2 * (q1 * q3 + q0 * q2);
@@ -142,15 +142,36 @@ Eigen::Vector3f estim_zeros(std::function<Eigen::Vector3f(Eigen::Vector3f)> f, E
 	return estim_zeros_recur(f, init_guess, 0);
 }
 
-Eigen::Vector3f torus(float u, float v, float r1, float r2, Eigen::Matrix4f transform) {
-	Eigen::Vector4f out = Eigen::Vector4f {
-		(r2 * cos(2 * M_PI * u) + r1) * (cos(2 * M_PI * v)),
-		(r2 * cos(2 * M_PI * u) + r1) * (sin(2 * M_PI * v)),
-		(r2) * (sin(2 * M_PI * u)),
-		1
+Eigen::Vector3f surface_func(float u, float v)
+{
+	// return {u, v, sin(sqrt(u*u+v*v))};
+
+	//sphere
+	// float r = 0.8 + cos(16 * M_PI * u + 8 * M_PI * v) * 0.2;
+	// return {
+	// 	(r * sin(2 * M_PI * u) * cos(2 * M_PI * v)),
+	// 	(r * sin(2 * M_PI * v)),
+	// 	(r * cos(2 * M_PI * u) * cos(2 * M_PI * v))
+	// };
+
+	// torus
+
+
+	float little_r = 0.8 + sin(16 * M_PI * v) * 0.2;
+	float big_r = 1.8 + sin(16 * M_PI * u) * 0.2;
+	return {
+		(little_r * cos(2 * M_PI * u) + big_r) * (cos(2 * M_PI * v)),
+		(little_r * cos(2 * M_PI * u) + big_r) * (sin(2 * M_PI * v)),
+		(little_r) * (sin(2 * M_PI * u))
 	};
+}
+
+Eigen::Vector3f surface_transform(float u, float v, Eigen::Matrix4f transform) {
+	Eigen::Vector3f point = surface_func(u,v);
+	Eigen::Vector4f out = {point[0],point[1],point[2],1}; // homog
+
 	out = transform * out;
-	return Eigen::Vector3f {
+	return {
 		out[0] / out[3],
 		out[1] / out[3],
 		out[2] / out[3],
@@ -161,12 +182,12 @@ Eigen::Vector3f ray(float t, Eigen::Vector3f center, Eigen::Vector3f dir) {
 	return center + t*dir;
 }
 
-Eigen::Vector3f estim_torus(Eigen::Vector3f center, Eigen::Vector3f dir, float r1, float r2, Eigen::Matrix4f transform){
+Eigen::Vector3f estim_surface(Eigen::Vector3f center, Eigen::Vector3f dir, Eigen::Matrix4f transform){
 	Eigen::Vector3f rv1 = {rand_(), rand_(), rand_()};
 
 	Eigen::Vector3f estim = estim_zeros(
 		[=](Eigen::Vector3f v) -> Eigen::Vector3f {
-			return torus(v[0], v[1], r1, r2, transform) - ray(v[2], center, dir);
+			return surface_transform(v[0], v[1], transform) - ray(v[2], center, dir);
 		},
 		rv1
 	);
@@ -175,12 +196,12 @@ Eigen::Vector3f estim_torus(Eigen::Vector3f center, Eigen::Vector3f dir, float r
 
 
 float get_depth(Eigen::Vector3f center, Eigen::Vector3f dir, float r1, float r2, Eigen::Matrix4f transform){
-	return estim_torus(center, dir.normalized(), r1, r2, transform)[2];
+	return estim_surface(center, dir.normalized(), transform)[2];
 }
 
 Eigen::Vector3f get_intersection(Eigen::Vector3f center, Eigen::Vector3f dir, float r1, float r2, Eigen::Matrix4f transform){
-	Eigen::Vector3f estim = estim_torus(center, dir, r1, r2, transform);
-	return torus(estim[0], estim[1], r1, r2, transform);
+	Eigen::Vector3f estim = estim_surface(center, dir, transform);
+	return surface_transform(estim[0], estim[1], transform);
 }
 
 Eigen::Vector3f c_w, c_u, c_v, c_du, c_dv, camera_00;
@@ -261,6 +282,7 @@ void onLoop() {
 	// std::clog << min << " " << max;
 
 	std::string color_grad = "#0*^. ";
+	// std::string color_grad = "#$0&%Q*+o-^. ";
 	int i = 0;
 	for (float l : luminances) {
 		int index = floor(color_grad.length() * ((l - min) / (max - min)));
@@ -280,7 +302,8 @@ void onLoop() {
 };
 
 int main() {
-    while (true) {
+    onLoop();
+    while (false) {
         onLoop();
 		// std::cin.ignore();
     }

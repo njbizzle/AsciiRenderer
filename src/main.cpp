@@ -73,9 +73,11 @@ Eigen::Matrix4f quat_rot_homog(float theta, Eigen::Vector3f axis) {
 	float q2 = q[2];
 	float q3 = q[3];
 	float r00, r01, r02, r10, r11, r12, r20, r21, r22;
+
 	// https://automaticaddison.com/how-to-convert-a-quaternion-to-a-rotation-matrix/
 	// this article had some code to copy paste so i don't have to make any typos
 	// alterations were made to turn it from python to cpp and to make it use a homogenous coordinate system
+
 	r00 = 2 * (q0 * q0 + q1 * q1) - 1;
     r01 = 2 * (q1 * q2 - q0 * q3);
     r02 = 2 * (q1 * q3 + q0 * q2);
@@ -157,8 +159,8 @@ Eigen::Vector3f surface_func(float u, float v)
 	// torus
 
 
-	float little_r = 0.8 + sin(16 * M_PI * v) * 0.2;
-	float big_r = 1.8 + sin(16 * M_PI * u) * 0.2;
+	little_r = 0.8 + sin(16 * M_PI * v) * 0.2;
+	// big_r = 1.8 + sin(16 * M_PI * u) * 0.2;
 	return {
 		(little_r * cos(2 * M_PI * u) + big_r) * (cos(2 * M_PI * v)),
 		(little_r * cos(2 * M_PI * u) + big_r) * (sin(2 * M_PI * v)),
@@ -268,6 +270,10 @@ void onLoop() {
 	calc_camera(look_from + Eigen::Vector3f{1e-5,1e-5,1e-5}, look_at); // exactly 0 gives some strange things
     for (int j = 0; j < HEIGHT; j++) {
         for (int i = 0; i < WIDTH; i++) {
+
+        	std::cout << "Total Progress : " << int(100.0 * float(WIDTH * j + i) / float(HEIGHT * WIDTH)) << "% | "
+				<< "Line : " << j << " / " << HEIGHT << ", "
+				<< "Line Progress : " << 100.0 * (float(i) / float(WIDTH)) << "%\r" << std::flush;
 
 			float l = get_luminance(i,j,t);
 			luminances.push_back(l);

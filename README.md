@@ -119,6 +119,6 @@ Speed is also a little bit of a problem. For the purpose of just being in the co
 
 ## Additional Images
 
-<img src="AsciiShapes/sin_uv_close_up.png">
-<img src="AsciiShapes/wavy_torus_hor_16_close_up.png">
-<img src="AsciiShapes/wavy_torus_strange.png">
+![](AsciiShapes/sin_uv_close_up.png)
+![](AsciiShapes/wavy_torus_hor_16_close_up.png)
+![](AsciiShapes/wavy_torus_strange.png)

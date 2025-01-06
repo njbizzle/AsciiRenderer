@@ -33,7 +33,7 @@ I had read a little bit on quaternions before and understood them on a very high
 
 The reason there are 2 different implementations is because using the quaternion rotation matrix is super fast, but I wanted to have an implementation that showed more of the reasoning behind the math, since otherwise I wouldn't really have much to show for all the research I did. I made the rotate_vec_quat function, mostly just for fun to make sure that I could get my own math working. 
 
-## Current Problems and Stuff That I’m Working On
+## Current Problems and Features That I’m Working On
 
 You’ve probably noticed the noise in the displays, how occasionally there seems to be a pixel whose luminance doesn’t really line up with what you’d expect. This is because since the rays sent out can intersect at multiple points, sometimes they converge at a zero that corresponds to an intersection that lies behind a closer intersection. I minimized this by taking a few samples and getting the closest intersection, but it’s not perfect and I’d love to find a more permanent solution to this in the future.
 

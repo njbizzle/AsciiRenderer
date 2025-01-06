@@ -1,3 +1,8 @@
+---
+geometry: margin=3cm
+colorlinks: true
+---
+
 # Ascii Renderer (The Terminal Torus)
 
 ## Overview

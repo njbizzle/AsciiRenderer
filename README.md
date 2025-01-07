@@ -1,5 +1,7 @@
 # Ascii Renderer (The Terminal Torus)
 
+#### A terminal program that displays and transforms surfaces embedded in 3D space.
+
 ## Overview
 
 I first had the idea to build my own rendering software while working on a separate [ray tracing project](https://github.com/njbizzle/RayTracingInOneWeekend) that rendered single images composed only of spheres. I created this to try to render more general surfaces as well as add movement to what I'm rendering. I decided to use C++, which at the time was new to me, but this was a way to get more familiar with the language. 

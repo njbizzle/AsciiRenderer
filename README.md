@@ -2,44 +2,44 @@
 
 ## Overview
 
-I first got this idea when working on a [ray tracing project](https://github.com/njbizzle/RayTracingInOneWeekend), where I only ever hardcoded the equations for spheres. That had me thinking about more general surfaces, and what it would take to be able to graph them, not just triangles and spheres. More specifically a continuous parametric surface, some function that transforms a 2D plane into 3D space. This project was much more of a focus on math for me, C++ is still a language that I’m learning and I wanted to challenge myself to make use of it for this project, but the cleanliness of the code and my C++ knowledge isn't what I hope to highlight. The whole project is only a few hundred lines, but it’s very dense and a lot of thinking went into every part of the project. 
+I first had the idea to build my own rendering software while working on a separate [ray tracing project](https://github.com/njbizzle/RayTracingInOneWeekend) that rendered single images composed only of spheres. I created this to try to render more general surfaces as well as add movement to what I'm rendering. I decided to use C++, which at the time was new to me, but this was a way to get more familiar with the language. 
 
-The parts that I really spent a lot of time on were the math behind the rotations, and the math behind estimating the distance from some ray to give a position and direction, and some surface living in 3D space. Though the example of the spinning donut is really specific, the structure of the program allows for really easy changes to have any surface to be graphed, any transformation combo of translation, scaling, and rotation, as well as quite a few cool camera tricks. It’s much more of a tool, the torus just demonstrates a few things it’s good at.
+Some of the key challenges in this project had been finding distances to surfaces, and later transforming the 3D embedding of the surface to rotate and move the object. These problems involved estimating zeros of a large but continuous six dimensional function, in addition to plenty of research into quaternions. Despite this project only being a few hundred lines, it took a significant amount of time. I hope this project demonstrates the effort I’ve put into learning and understanding the math I used.
 
 ## Tools Used
 
-- Cmake (for building), Clang (the compiler), and Clion (the IDE)
-- Eigen (a linear algebra library)
+The Eigen library for linear algebra
+The C++ language
+The GCC compiler for C++
+CMake as a build tool
+CLion as a development environment
+Git/GitHub for version control
 
-## The Idea
+## Solving for the Surface distance, the estim_zeros function
 
-Modern GPUs are built around using triangles, and so are most nearly all graphics frameworks, so using pre-existing tools would be difficult. I also didn't want still images in a pixel map like the [ray tracing project](https://github.com/njbizzle/RayTracingInOneWeekend), since I wanted a moving picture. The only way I knew how to truly make my own thing, was with the terminal and ascii art. The goal was to have a program that would send out a ton of rays, test the distance, and then choose an appropriately dense ascii character (not really lighting yet, more just a depth map).
+When determining how dense any given ASCII character should be, the program takes the direction of the camera and finds the distance to the surface. Borrowing ideas from my [ray tracing project](https://github.com/njbizzle/RayTracingInOneWeekend), each character is the origin of a ray that travels out until it intersects the surface.
 
-When I first started thinking through the project I got stumped on finding a way to programmatically solve for the intersection between some surface and a ray sent out to test the distance from the camera. But, when doing some optimization problems for higher dimensional functions in a calculus class, I had an idea of how I might be able to estimate these points.
+The ray spans a 1D subspace in 3D space, while the surface spans a 2D subspace. My idea was to have a function taking in the 1D coordinate of the ray and 2D coordinate of the surface, then returning the distance between where the ray and surface are in 3D space. The zeros of this function correspond to points where the ray intersects the surface.
 
-## Solving for the Intersections, the estim_zeros function
+Doing some research into ways to optimize for the zeros of the function, I found algorithms such as fsolve and mathematical methods such as the Powell Hybrid Method. I decided for my purposes, a version of Newton's method would be best suited for the project, despite not being the fastest converging option.
 
-The setup is that I have a ray with a position and normalized direction, and then a parametric surface. So idea was to have a function taking in a ray distance and the 2D inputs to a surface, then returning a 3D vector representing the distance between where the ray ends up (given the distance) and the 3D output of the surface (given the 2D coordinates), all of which is continuous, meaning that there are simpler ways to estimate its zeros, which in this case corresponds to the ray intersecting with the surface (the distance between the 2 is zero).
+## Moving and Rotating the Surfaces 
 
-I did some research on existing optimization algorithms and read about some really interesting stuff like the math behind the fsolve algorithm, which is a method called the powell hybrid method. I decided for my purposes, a multidimensional version of Newton's method would work well, despite not being the fastest option. So the program sends out a ray for each ascii character (right now there's no perspective, it all looks like an isometric drawing) and is able to estimate how far until the ray intersects a surface.
-
-## Transformations
-
-This drew on a part of my [Vulkan project](https://github.com/njbizzle/VulkanTutorial) that I really loved working with, which was using matrices to represent transformations. I just loved the idea of having all the information being stored so compactly in a matrix. I did a lot of the math and thinking around how to scale and translate (using homogeneous coordinates since it's a linear transformation) in that other project, but I really wanted to understand the rotation portion when reimplementing everything here.
+This drew on a part of another graphics [project](https://github.com/njbizzle/VulkanTutorial) that I deeply enjoyed working on–using matrices to represent what are called transforms. Transforms act on the surfaces, taking them from a local space, where its 3D embedding lives, to a world space where many surfaces can exist. Transforms serve to displace, scale, and rotate these surfaces, and are all compactly stored in 4x4 matrices that act on homogenous coordinates, a trick allowing translation to be represented as a linear transformation. 
 
 ## Quaternion Rotations, the quat_rot_homog and rotate_vec_quat functions
 
-I had read a little bit on quaternions before and understood them on a very high level, but when it came to implementing something, I got stuck really fast. I watched quite a few lectures before finding a really awesome [video series](https://youtube.com/playlist?list=PLpzmRsG7u_gr0FO12cBWj-15_e0yqQQ1U&si=c61z5-dsT5mNspKx) of six 20 - 30 minute lectures that really took a derivation centric approach to the subject that I didn’t find in many other lectures. I was able to work stuff out in my notebook and found a way to implement everything in code. 
+My background knowledge on quaternions was limited, and when it came to implementing rotations, I ran into a lot of challenges. I want to credit my favorite resource that I found on the topic while researching, a [series of lectures](https://youtube.com/playlist?list=PLpzmRsG7u_gr0FO12cBWj-15_e0yqQQ1U&si=c61z5-dsT5mNspKx) that took a derivation centric approach that was difficult to find with resources that didn’t require much background. I was able to work through the implementation in my notebook and then translate it into code.
 
-The reason there are 2 different implementations is because using the quaternion rotation matrix is super fast, but I wanted to have an implementation that showed more of the reasoning behind the math, since otherwise I wouldn't really have much to show for all the research I did. I made the rotate_vec_quat function, mostly just for fun to make sure that I could get my own math working. 
+I opted to have two separate implementations. Making use of the quaternion rotation matrix is very practical and fast. However, I wanted to have a product that showed the effort I put into researching the topic, and the new level of understanding I gained. The ```rotate_vec_quat``` function isn’t in use, but it was a fun challenge that applied the ideas that I was learning.
 
-## Current Problems and Features That I’m Working On
+## Current Problems and Future Features
 
-You’ve probably noticed the noise in the displays, how occasionally there seems to be a pixel whose luminance doesn’t really line up with what you’d expect. This is because since the rays sent out can intersect at multiple points, sometimes they converge at a zero that corresponds to an intersection that lies behind a closer intersection. I minimized this by taking a few samples and getting the closest intersection, but it’s not perfect and I’d love to find a more permanent solution to this in the future.
+Occasionally there are characters whose luminance don’t line up with what’s expected. At times there are two intersections, and the program only looks for one at a time. Occasionally the intersection that the program finds lies behind what’s expected. I minimized this problem by taking a few samples and getting the closest intersection, which causes a large loss in performance.
 
-Also the “luminance” of the surface at the moment, is really just the depth, or the distance from the camera. I want to do more of a ray tracing technique in the future, and make use of the normals to actually bounce some light around and have a way to define actual light sources, rather than just a depth map.
+Also, the “luminance” of the surface at the moment is just the depth, or the distance from the camera. I want to implement lighting in the future, and make use of the normals to actually bounce light around and have a way to define actual light sources, rather than just a depth map.
 
-Speed is also a little bit of a problem. For the purpose of just being in the console and slowly spinning, it works well. But it currently is doing an insane amount of matrix inversions (which I’m pretty sure is the main source of the slowness), and I’m certain there are faster methods that either converge faster or use fewer resources.
+For the purpose of slowly rotating a small display of a torus, the program runs decently. However, more complicated tasks take longer to render. The program is currently doing a tremendous amount of matrix inversions while making use of Newton’s method and I know there are other options that either converge faster or use fewer resources.
 
 ## Additional Images
 
